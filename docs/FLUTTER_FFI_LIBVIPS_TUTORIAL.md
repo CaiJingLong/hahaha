@@ -223,8 +223,8 @@ final class VipsImage extends Opaque {}
 final class VipsOperation extends Opaque {}
 
 // 原生函数类型定义
-typedef VipsInitNative = Int32 Function();
-typedef VipsInit = int Function();
+typedef VipsInitNative = Int32 Function(Pointer<Utf8> argv0);
+typedef VipsInit = int Function(Pointer<Utf8> argv0);
 
 typedef VipsShutdownNative = Void Function();
 typedef VipsShutdown = void Function();
@@ -347,6 +347,9 @@ class VipsImageWrapper {
   bool _disposed = false;
 
   VipsImageWrapper._(this._pointer);
+
+  /// 检查指针是否为空
+  bool get isNull => _pointer == nullptr;
 
   /// 从文件加载图像
   factory VipsImageWrapper.fromFile(String filename) {
@@ -705,7 +708,7 @@ VipsImageWrapper loadImageWithErrorHandling(String path) {
   clearVipsError();
 
   final image = VipsImageWrapper.fromFile(path);
-  if (image._pointer == nullptr) {
+  if (image.isNull) {
     final error = getVipsError();
     throw VipsException('Failed to load image: ${error ?? "Unknown error"}');
   }
